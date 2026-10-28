@@ -1,0 +1,25 @@
+/* Keyboard users can jump past the sidebar: hidden until it takes focus, the first stop on the page. */
+.app-shell-skip {
+  position: absolute;
+  z-index: 1;
+  top: 8px;
+  left: 8px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  outline: 2px solid;
+  transform: translateY(calc(-100% - 16px));
+}
+
+.app-shell-skip:focus-visible {
+  transform: none;
+}
+
+/* The sidebar toggle glyph, drawn in the button's text colour so it follows the theme. */
+.app-shell-toggle-icon {
+  display: block;
+  width: 16px;
+  height: 16px;
+  background-color: currentColor;
+  mask: var(--app-shell-icon) center / contain no-repeat;
+}

@@ -1,0 +1,6 @@
+/* The app shell fills the window; antd styles everything inside it. */
+html,
+body {
+  height: 100%;
+  margin: 0;
+}

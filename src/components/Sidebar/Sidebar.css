@@ -1,0 +1,263 @@
+/* antd indents nested items by level × inlineIndent; the design aligns them with the parent label instead. */
+.sidebar .ant-menu-inline .ant-menu-sub .ant-menu-item {
+  padding-inline-start: var(--sidebar-sub-indent) !important;
+}
+
+/* antd's dark theme has no subMenuItemSelectedColor of its own; the design keeps open titles at the item colour. */
+.sidebar .ant-menu-dark.ant-menu-inline .ant-menu-submenu-selected > .ant-menu-submenu-title {
+  color: var(--sidebar-dark-submenu-selected);
+}
+
+.sidebar .ant-menu {
+  border-inline-end: none !important;
+}
+
+/* Items' block margins collapse into one 4px gap, except across the edges of an open submenu's
+   list, whose clipping wrapper keeps them apart (8px). Drop the outer ones so every gap is 4px. */
+.sidebar .ant-menu-inline .ant-menu-sub > .ant-menu-item:first-child {
+  margin-top: 0;
+}
+
+.sidebar .ant-menu-inline .ant-menu-sub > .ant-menu-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Collapsed, a submenu holding the selected item looks selected like any other item; antd only
+   recolours its icon. Expanded, the selected child shows it instead. */
+.sidebar[data-collapsed] .ant-menu .ant-menu-submenu-selected > .ant-menu-submenu-title {
+  background-color: var(--sidebar-selected-bg);
+  color: var(--sidebar-selected-color);
+}
+
+/* antd reserves room for its own absolutely placed arrow; ours sits inline, so end it on the item padding. */
+.sidebar .ant-menu-inline .ant-menu-submenu-title {
+  padding-inline-end: var(--sidebar-item-padding);
+}
+
+/* Collapse: the edge moves, everything past it is clipped, so content hides right to left. */
+.sidebar {
+  overflow: hidden;
+  transition: width var(--sidebar-duration) var(--sidebar-ease);
+}
+
+.sidebar-header {
+  transition: padding var(--sidebar-duration) var(--sidebar-ease);
+}
+
+/* Resizing tracks the pointer (or each arrow key) exactly; only letting go past a limit eases,
+   as the width settles back from its overshoot. */
+.sidebar[data-resizing],
+.sidebar:has(> .sidebar-resize:focus-visible) {
+  transition: none;
+}
+
+/* The right edge: a 1px line inside the sidebar, which clips anything outside it. */
+.sidebar-edge {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  width: 1px;
+  background: var(--sidebar-edge);
+  pointer-events: none;
+}
+
+/* The resize handle: 6px of hit area along the edge, inside the items' 8px margin. Hovering
+   brings up a stronger line, fading out towards the top and bottom. */
+.sidebar-resize {
+  position: absolute;
+  z-index: 2;
+  inset-block: 0;
+  inset-inline-end: 0;
+  width: 6px;
+  cursor: col-resize;
+  touch-action: none;
+  outline: none;
+}
+
+.sidebar-resize::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--sidebar-edge-active) 20%,
+    var(--sidebar-edge-active) 80%,
+    transparent
+  );
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+/* A short delay before it shows, so the pointer crossing the edge on its way elsewhere doesn't
+   flash it; it leaves at once. */
+@media (hover: hover) and (pointer: fine) {
+  .sidebar-resize:hover::after {
+    opacity: 1;
+    transition-delay: 100ms;
+  }
+}
+
+.sidebar[data-resizing] .sidebar-resize::after,
+.sidebar-resize:focus-visible::after {
+  opacity: 1;
+  transition-delay: 0ms;
+}
+
+/* Footer row: reset the native button, then behave like a menu item (same hover fill and timing). */
+.sidebar-account {
+  display: flex;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition:
+    padding var(--sidebar-duration) var(--sidebar-ease),
+    background-color var(--sidebar-hover-duration);
+}
+
+/* Collapsed, the row is just the avatar: no fill around it. The fill stays while its menu is open. */
+.sidebar:not([data-collapsed]) .sidebar-account[data-open] {
+  background-color: var(--sidebar-account-hover-bg);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .sidebar:not([data-collapsed]) .sidebar-account:hover {
+    background-color: var(--sidebar-account-hover-bg);
+  }
+}
+
+/* antd places the submenu chevron 8px from the item's edge, which leaves the glyph 1px past the
+   content edge the Theme switch and the dataset check marks end on. */
+.sidebar-account-menu .ant-dropdown-menu .ant-dropdown-menu-submenu-title .ant-dropdown-menu-submenu-expand-icon {
+  inset-inline-end: 9px;
+}
+
+/* Drilling into a submenu (mobile): the new list slides in a few pixels from the side it came from. */
+@keyframes sidebar-drill-forward {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+}
+
+@keyframes sidebar-drill-back {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+}
+
+.sidebar-drill-forward .ant-dropdown-menu-root > li {
+  animation: sidebar-drill-forward 200ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.sidebar-drill-back .ant-dropdown-menu-root > li {
+  animation: sidebar-drill-back 200ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-drill-forward .ant-dropdown-menu-root > li,
+  .sidebar-drill-back .ant-dropdown-menu-root > li {
+    animation: none;
+  }
+}
+
+.sidebar-account:focus-visible {
+  outline: var(--sidebar-focus-ring);
+  outline-offset: 1px;
+}
+
+/* Labels fade with antd's own label timing while the edge passes over them. */
+.sidebar-fade {
+  transition: opacity var(--sidebar-duration) var(--sidebar-fade-ease);
+}
+
+/* Top-level labels only: nested items close with the submenu's own height motion. */
+.sidebar[data-collapsed] .sidebar-fade,
+.sidebar[data-collapsed] .ant-menu-root > .ant-menu-item > .ant-menu-title-content,
+.sidebar[data-collapsed] .ant-menu-root > .ant-menu-submenu > .ant-menu-submenu-title > .ant-menu-title-content,
+.sidebar[data-collapsed] .sidebar-chevron {
+  opacity: 0;
+}
+
+/* While the edge moves, clip instead of re-truncating, so labels are cut rather than rewritten to "N…". */
+.sidebar[data-animating] .ant-menu .ant-menu-title-content {
+  text-overflow: clip;
+}
+
+/* The chevron rides the item's closing edge, so it leaves faster than the labels. */
+.sidebar .ant-menu .ant-menu-submenu-title .sidebar-chevron {
+  /* antd gives menu icons iconSize min-width, which would centre the 12px glyph short of the edge. */
+  min-width: 0;
+  transition: opacity var(--sidebar-duration) var(--sidebar-fade-ease);
+}
+
+.sidebar[data-collapsed] .ant-menu .ant-menu-submenu-title .sidebar-chevron {
+  transition-duration: var(--sidebar-duration-fast);
+}
+
+/* The logo mark only acts as the expand button once the rail is collapsed. */
+.sidebar:not([data-collapsed]) .sidebar-logo {
+  pointer-events: none;
+}
+
+/* The lockup overlaps the logo button; faded out when collapsed, it mustn't catch the button's hover. */
+.sidebar-lockup {
+  pointer-events: none;
+}
+
+/* Collapsed, the logo previews what it does: the mark crossfades to the sidebar icon. */
+.sidebar-logo-icon {
+  display: grid;
+  place-items: center;
+}
+
+.sidebar-logo-icon > img {
+  grid-area: 1 / 1;
+  transition: opacity var(--sidebar-duration-fast) var(--sidebar-fade-ease);
+}
+
+.sidebar-logo-expand {
+  opacity: 0;
+}
+
+.sidebar[data-collapsed] .sidebar-logo:focus-visible .sidebar-logo-mark {
+  opacity: 0;
+}
+
+.sidebar[data-collapsed] .sidebar-logo:focus-visible .sidebar-logo-expand {
+  opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .sidebar[data-collapsed] .sidebar-logo:hover .sidebar-logo-mark {
+    opacity: 0;
+  }
+
+  .sidebar[data-collapsed] .sidebar-logo:hover .sidebar-logo-expand {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar,
+  .sidebar-header {
+    transition: none;
+  }
+
+  .sidebar-account {
+    transition: background-color var(--sidebar-hover-duration);
+  }
+}
+
+.sidebar-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

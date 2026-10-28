@@ -1,0 +1,16 @@
+/* Outlined arrow for floating surfaces that keep one (see floatingConfigs in theme.ts).
+   antd draws the arrow as a clipped triangle (::before) over a rotated square (::after) that
+   traces its two outer edges, so outlining those two sides of the square outlines the arrow.
+   The arrow sits over the body's outline where they meet, so the two read as one shape. */
+/* Dark dropdowns' danger red (see floatingConfigs in theme.ts). The menu sets every --ant-* variable
+   itself, so the override goes on the menu, and on submenu popups' menus too. */
+.floating-danger .ant-dropdown-menu {
+  --ant-color-error: var(--floating-danger);
+}
+
+.floating-arrow > .ant-popover-arrow::after {
+  box-sizing: border-box;
+  border: 0 solid var(--floating-outline);
+  border-inline-end-width: 1px;
+  border-bottom-width: 1px;
+}
